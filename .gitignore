@@ -137,3 +137,15 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+#vs-code settings
+settings.json
+
+.hintrc
+
+.DS_Store
+/node_modules/
+
+# React Router
+/.react-router/
+/build/

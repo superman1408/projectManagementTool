@@ -1,2 +1,0 @@
-# projectManagementTool
-Project Management Tool

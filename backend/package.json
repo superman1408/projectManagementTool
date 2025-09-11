@@ -1,0 +1,44 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "project management tool backend properties",
+  "keywords": [
+    "taskmaster",
+    "pmt",
+    "erp"
+  ],
+  "homepage": "https://github.com/superman1408/taskMaster#readme",
+  "bugs": {
+    "url": "https://github.com/superman1408/taskMaster/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/superman1408/taskMaster.git"
+  },
+  "license": "ISC",
+  "author": "Pratik Kumar",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "@arcjet/inspect": "^1.0.0-beta.9",
+    "@arcjet/node": "^1.0.0-beta.9",
+    "@sendgrid/mail": "^8.1.5",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.4",
+    "morgan": "^1.10.1",
+    "zod": "^3.25.76",
+    "zod-express-middleware": "^1.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
