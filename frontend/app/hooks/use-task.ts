@@ -225,3 +225,12 @@ export const getMyTasksQuery = () => {
         queryFn: () => fetchData(`/tasks/my-task`),
     });
 };
+
+
+
+export const useGetMyTasksQuery = () => {
+  return useQuery({
+    queryKey: ["my-tasks", "user"],
+    queryFn: () => fetchData("/tasks/my-tasks"),
+  });
+};

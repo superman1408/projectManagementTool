@@ -26,14 +26,14 @@ export const SidebarComponent = ({ currentWorkspace }: { currentWorkspace: Works
 
     const navItems = [
         {
-            title: "Dashboard",
-            href: "/dashboard",
-            icon: LayoutDashboard,
-        },
-        {
             title: "Workspaces",
             href: "/workspaces",
             icon: Users,
+        },
+        {
+            title: "Dashboard",
+            href: "/dashboard",
+            icon: LayoutDashboard,
         },
         {
             title: "My Tasks",
@@ -46,8 +46,8 @@ export const SidebarComponent = ({ currentWorkspace }: { currentWorkspace: Works
             icon: Users,
         },
         {
-            title: "Achieved",
-            href: `/achieved`,
+            title: "Archived",
+            href: `/archived-tasks`,
             icon: CheckCircle2,
         },
         {

@@ -19,26 +19,25 @@ import {
   watchTask,
   archivedTask,
   getMyTasks,
+  getArchivedTasks,
+  deleteTask,
 } from "../controllers/task.js";
 import authMiddleware from "../middleware/auth-middleware.js";
 import { taskSchema } from "../libs/validate-schema.js";
 
-
 const router = express.Router();
 
-
 router.post(
-    "/:projectId/create-task",
-    authMiddleware,
-    validateRequest({
-        params: z.object({
-            projectId: z.string(),
-        }),
-        body: taskSchema
+  "/:projectId/create-task",
+  authMiddleware,
+  validateRequest({
+    params: z.object({
+      projectId: z.string(),
     }),
-    createTask
+    body: taskSchema,
+  }),
+  createTask
 );
-
 
 router.post(
   "/:taskId/add-subtask",
@@ -50,7 +49,6 @@ router.post(
   addSubTask
 );
 
-
 router.post(
   "/:taskId/add-comment",
   authMiddleware,
@@ -61,7 +59,6 @@ router.post(
   addComment
 );
 
-
 router.post(
   "/:taskId/watch",
   authMiddleware,
@@ -71,7 +68,6 @@ router.post(
   watchTask
 );
 
-
 router.post(
   "/:taskId/archived",
   authMiddleware,
@@ -80,7 +76,6 @@ router.post(
   }),
   archivedTask
 );
-
 
 router.put(
   "/:taskId/update-subtask/:subTaskId",
@@ -92,18 +87,15 @@ router.put(
   updateSubTask
 );
 
-
 router.put(
-    "/:taskId/title",
-    authMiddleware,
-    validateRequest({
-        params: z.object({ taskId: z.string() }),
-        body: z.object({ title: z.string() })
-    }),
-    updateTaskTitle
-
+  "/:taskId/title",
+  authMiddleware,
+  validateRequest({
+    params: z.object({ taskId: z.string() }),
+    body: z.object({ title: z.string() }),
+  }),
+  updateTaskTitle
 );
-
 
 router.put(
   "/:taskId/description",
@@ -115,7 +107,6 @@ router.put(
   updateTaskDescription
 );
 
-
 router.put(
   "/:taskId/status",
   authMiddleware,
@@ -125,7 +116,6 @@ router.put(
   }),
   updateTaskStatus
 );
-
 
 router.put(
   "/:taskId/assignees",
@@ -137,7 +127,6 @@ router.put(
   updateTaskAssignees
 );
 
-
 router.put(
   "/:taskId/priority",
   authMiddleware,
@@ -148,18 +137,36 @@ router.put(
   updateTaskPriority
 );
 
-
-router.get(
-    "/:taskId",
-    authMiddleware,
-    validateRequest({
-        params: z.object({
-            taskId: z.string(),
-        }),
-    }),
-    getTaskById
+router.delete(
+  "/:taskId/delete",
+  authMiddleware,
+  validateRequest({
+    params: z.object({ taskId: z.string() }),
+  }),
+  deleteTask
 );
 
+router.get("/archived-tasks", authMiddleware, getArchivedTasks);
+
+router.get(
+  "/my-tasks",
+  authMiddleware,
+  // validateRequest({
+  //   params: z.object({ taskId: z.string() }),
+  // }),
+  getMyTasks
+);
+
+router.get(
+  "/:taskId",
+  authMiddleware,
+  validateRequest({
+    params: z.object({
+      taskId: z.string(),
+    }),
+  }),
+  getTaskById
+);
 
 router.get(
   "/:resourceId/activity",
@@ -170,7 +177,6 @@ router.get(
   getActivityByResourceId
 );
 
-
 router.get(
   "/:taskId/comments",
   authMiddleware,
@@ -180,15 +186,13 @@ router.get(
   getCommentsByTaskId
 );
 
-
 router.get(
-  "/:taskId/my-task",
+  "/my-tasks",
   authMiddleware,
   validateRequest({
     params: z.object({ taskId: z.string() }),
   }),
   getMyTasks
 );
-
 
 export default router;

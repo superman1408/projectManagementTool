@@ -35,6 +35,23 @@ const Dashboard = () => {
   };
 
 
+
+  if (!workspaceId || !data) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-center">
+        <div className="rounded-xl bg-gray-100 px-6 py-4 shadow-sm">
+          <p className="text-lg font-medium text-gray-700">
+            No workspace selected
+          </p>
+          <p className="text-sm text-gray-500">
+            Please choose a workspace to view its details.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+
   if (isPending) {
     return (
       <div>

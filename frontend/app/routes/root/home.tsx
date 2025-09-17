@@ -1,3 +1,4 @@
+import React from "react";
 import type { Route } from "../../+types/root";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
@@ -14,12 +15,12 @@ export function meta({}: Route.MetaArgs) {
 
 const Homepage = () => {
   return (
-    <div className="relative w-full h-screen flex flex-col bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white">
+    <div className="relative w-full h-screen flex flex-col bg-gradient-to-br from-blue-100 via-indigo-400 to-purple-800 text-white">
       {/* Header */}
       <header className="absolute top-0 left-0 w-full flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
-          <img src="/logoWB.png" alt="Ashkam Energy Logo" className="w-35 h-12" />
-          <span className="text-xl font-bold text-white">
+          <img src="/logoT.png" alt="Ashkam Energy Logo" className="w-35 h-12" />
+          <span className="text-sm font-bold text-blue-950">
             Ashkam Energy Pvt Ltd
           </span>
         </div>
@@ -40,7 +41,7 @@ const Homepage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          Welcome to ASHKAM ENERGY PVT LTD
+          Welcome to <span className="text-[#E46025]">A</span ><span className="text-[#0B7882] font-helvetica">SH</span><span className="text-[#0D325C] font-helvetica">KAM</span> ENERGY PVT LTD
           <span className="block mt-2 text-yellow-300">
             Project Management Tool
           </span>
@@ -73,7 +74,7 @@ const Homepage = () => {
           <Button
             asChild
             variant="outline"
-            className="px-6 py-3 text-lg rounded-2xl border-2 border-white text-white hover:bg-yellow-300 hover:border-blue-300 shadow-lg transition-all"
+            className="px-6 py-3 text-lg rounded-2xl border-2 border-white text-gray-300 hover:bg-yellow-300 hover:border-blue-300 shadow-lg transition-all"
           >
             <Link to="/sign-up">Sign Up</Link>
           </Button>
