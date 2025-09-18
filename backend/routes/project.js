@@ -7,6 +7,7 @@ import {
   createProject,
   getProjectDetails,
   getProjectTasks,
+  updateProjectStatus,
 } from "../controllers/project.js";
 
 
@@ -23,6 +24,17 @@ router.post(
     body: projectSchema,
   }),
   createProject
+);
+
+
+router.put(
+  "/:projectId/status",
+  authMiddleware,
+  validateRequest({
+    params: z.object({ projectId: z.string() }),
+    body: z.object({ status: z.string() }),
+  }),
+  updateProjectStatus
 );
 
 
