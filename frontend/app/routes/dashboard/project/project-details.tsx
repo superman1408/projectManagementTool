@@ -2,6 +2,7 @@
 import { BackButton } from "@/components/back-button";
 import { Loader } from "@/components/loader";
 import { CreateTaskDialog } from "@/components/task/create-task-dialog";
+import { TaskStatusSelector } from "@/components/task/task-status-selector";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UseProjectQuery } from "@/hooks/use-project";
+import { useUpdateTaskStatusMutation } from "@/hooks/use-task";
 import { getProjectProgress } from "@/lib";
 import { cn } from "@/lib/utils";
 import type { Project, Task, TaskStatus } from "@/types";
@@ -16,6 +18,7 @@ import { format } from "date-fns";
 import { AlertCircle, Calendar, CheckCircle, Clock } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 const ProjectDetails = () => {
   const { projectId, workspaceId } = useParams<{
@@ -247,6 +250,30 @@ const TaskColumn = ({
 };
 
 const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
+
+  const { mutate, isPending } = useUpdateTaskStatusMutation();
+  
+  
+
+  const handleUpdateStatus = (status: TaskStatus) => {
+    mutate(
+      { taskId: task._id, status },
+      {
+        onSuccess: () => {
+          toast.success(`Marked as ${status}`);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message || "Failed to update status";
+          toast.error(errorMessage);
+          console.error(error);
+        },
+      }
+    );
+  };
+
+
+  
   return (
     <Card
       onClick={onClick}
@@ -266,16 +293,15 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
             {task.priority}
           </Badge>
 
-          <div className="flex gap-1">
+          <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
             {task.status !== "To Do" && (
               <Button
                 variant={"ghost"}
                 size={"icon"}
                 className="size-6"
-                onClick={() => {
-                  console.log("mark as to do");
-                }}
+                onClick={() => handleUpdateStatus("To Do")}
                 title="Mark as To Do"
+                disabled={isPending}
               >
                 <AlertCircle className={cn("size-4")} />
                 <span className="sr-only">Mark as To Do</span>
@@ -286,10 +312,9 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
                 variant={"ghost"}
                 size={"icon"}
                 className="size-6"
-                onClick={() => {
-                  console.log("mark as in progress");
-                }}
+                onClick={() => handleUpdateStatus("In Progress")}
                 title="Mark as In Progress"
+                disabled={isPending}
               >
                 <Clock className={cn("size-4")} />
                 <span className="sr-only">Mark as In Progress</span>
@@ -300,15 +325,15 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
                 variant={"ghost"}
                 size={"icon"}
                 className="size-6"
-                onClick={() => {
-                  console.log("mark as done");
-                }}
+                onClick={() => handleUpdateStatus("Done")}
                 title="Mark as Done"
+                disabled={isPending}
               >
                 <CheckCircle className={cn("size-4")} />
                 <span className="sr-only">Mark as Done</span>
               </Button>
             )}
+            {/* <TaskStatusSelector status={task.status} taskId={task._id} /> */}
           </div>
         </div>
       </CardHeader>
