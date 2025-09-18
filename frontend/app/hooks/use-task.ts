@@ -1,5 +1,5 @@
 import type { CreateTaskFormData } from "@/components/task/create-task-dialog";
-import { fetchData, postData, updateData } from "@/lib/fetch-util";
+import { deleteData, fetchData, postData, updateData } from "@/lib/fetch-util";
 import type { TaskPriority, TaskStatus } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -11,7 +11,7 @@ export const useCreateTaskMutation = () => {
             postData(`tasks/${data.projectId}/create-task`, data.taskData),
         onSuccess: (data: any) => {
             queryClient.invalidateQueries({
-                queryKey: ["projectId", data.project],
+                queryKey: ["project", data.project],
             });
             queryClient.invalidateQueries({
                 queryKey: ["task-activity", data._id],
@@ -218,19 +218,35 @@ export const useArchivedTaskMutation = () => {
 };
 
 
-export const getMyTasksQuery = () => { 
-
-    return useQuery({
-        queryKey: ["my-tasks", "user"],
-        queryFn: () => fetchData(`/tasks/my-task`),
-    });
-};
-
-
-
 export const useGetMyTasksQuery = () => {
   return useQuery({
     queryKey: ["my-tasks", "user"],
     queryFn: () => fetchData("/tasks/my-tasks"),
   });
+};
+
+
+export const useGetArchivedTasksQuery = () => { 
+    return useQuery({
+        queryKey: ["archivedTasks"],
+        queryFn: () => fetchData("/tasks/archived-tasks"),
+    });
+};
+
+
+export const useDeleteTaskMutation = () => { 
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (data: { taskId: string }) => 
+            deleteData(`/tasks/${data.taskId}/delete`),
+        onSuccess: (data: any) => {
+            queryClient.invalidateQueries({
+                queryKey: ["task", data._id],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["task-activity", data._id],
+            });
+        },
+    });
 };

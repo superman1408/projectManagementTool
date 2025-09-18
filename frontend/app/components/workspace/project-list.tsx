@@ -36,7 +36,6 @@ export const ProjectList = ({
                                 <ProjectCard
                                     key={project._id}
                                     project={project}
-                                    progress={projectProgress}
                                     workspaceId={workspaceId}
                                 />
                             );

@@ -27,4 +27,8 @@ export default [
         route("archived-tasks", "routes/dashboard/archived-tasks.tsx"),
         route("settings", "routes/dashboard/settings.tsx"),
     ]),
+
+    layout("routes/user/user-layout.tsx", [
+        route("user/profile", "routes/user/profile.tsx"),
+    ]),
 ] satisfies RouteConfig;

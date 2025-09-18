@@ -2,7 +2,7 @@ import type { Project } from "@/types";
 import { Link } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { cn } from "@/lib/utils";
-import { getTaskStatusColor } from "@/lib";
+import { getProjectProgress, getTaskStatusColor } from "@/lib";
 import { Progress } from "../ui/progress";
 import { format } from "date-fns";
 import { CalendarDays } from "lucide-react";
@@ -11,16 +11,15 @@ import { CalendarDays } from "lucide-react";
 
 interface ProjectCardProps {
     project: Project;
-    progress: number;
     workspaceId: string;
 }
 
 
 export const ProjectCard = ({
     project,
-    progress,
     workspaceId,
 }: ProjectCardProps) => { 
+    const progress = getProjectProgress(project.tasks);
 
     
     return (

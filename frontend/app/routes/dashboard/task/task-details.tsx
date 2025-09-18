@@ -11,7 +11,7 @@ import TaskTitle from '@/components/task/task-title';
 import { Watchers } from '@/components/task/watchers';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useArchivedTaskMutation, useTaskByIdQuery, useWatchTaskMutation } from '@/hooks/use-task';
+import { useArchivedTaskMutation, useDeleteTaskMutation, useTaskByIdQuery, useWatchTaskMutation } from '@/hooks/use-task';
 import { useAuth } from '@/provider/auth-context';
 import type { Project, Task } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
@@ -44,6 +44,8 @@ const TaskDetails = () => {
     const { mutate: watchTask, isPending: isWatching } = useWatchTaskMutation();
 
     const { mutate: archived, isPending: isArchived } = useArchivedTaskMutation();
+
+    const { mutate: deleteTask, isPending: isDeleting } = useDeleteTaskMutation();
 
 
 
@@ -104,6 +106,24 @@ const TaskDetails = () => {
                     toast.error("Failed to archived task");
                 },
             },
+        );
+    };
+
+
+    const handleDeleteTask = () => {
+        if (!window.confirm("Are you sure you want to delete this task?")) return;
+
+        deleteTask(
+            { taskId: task._id },
+            {
+                onSuccess: () => {
+                    toast.success("Task deleted successfully");
+                    navigate(`/workspaces/${workspaceId}/projects/${projectId}`);
+                },
+                onError: () => {
+                    toast.error("Failed to delete task");
+                },
+            }
         );
     };
 
@@ -193,13 +213,23 @@ const TaskDetails = () => {
                                 <TaskStatusSelector status={task.status} taskId={task._id} />
                                 
 
-                                <Button
+                                {/* <Button
                                     variant={"destructive"}
                                     size="sm"
                                     onClick={() => { }}
                                     className="hidden md:block"
                                 >
                                     Delete Task
+                                </Button> */}
+
+                                <Button
+                                    variant={"destructive"}
+                                    size="sm"
+                                    onClick={handleDeleteTask}
+                                    className="hidden md:block"
+                                    disabled={isDeleting}
+                                >
+                                    {isDeleting ? "Deleting..." : "Delete Task"}
                                 </Button>
                             </div>
                         </div>
