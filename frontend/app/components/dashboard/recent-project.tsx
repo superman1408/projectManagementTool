@@ -28,7 +28,7 @@ export const RecentProjects = ({ data }: { data: Project[] }) => {
               <div key={project._id} className="border rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <Link
-                    to={`/workspaces${workspaceId}/projects/${project._id}`}
+                    to={`/workspaces/${workspaceId}/projects/${project._id}`}
                   >
                     <h3 className="font-medium hover:text-primary transition-colors">
                       {project.title}
