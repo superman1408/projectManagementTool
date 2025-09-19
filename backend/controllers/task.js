@@ -483,6 +483,7 @@ const getCommentsByTaskId = async (req, res) => {
   }
 };
 
+
 const addComment = async (req, res) => {
   console.log("you just triggered add comment");
 
@@ -540,6 +541,7 @@ const addComment = async (req, res) => {
     });
   }
 };
+
 
 const watchTask = async (req, res) => {
   try {
@@ -602,11 +604,14 @@ const watchTask = async (req, res) => {
   }
 };
 
+
+
 const archivedTask = async (req, res) => {
   try {
     const { taskId } = req.params;
 
     const task = await Task.findById(taskId);
+
 
     if (!task) {
       return res.status(404).json({
@@ -615,6 +620,9 @@ const archivedTask = async (req, res) => {
     }
 
     const project = await Project.findById(task.project);
+
+    // const workspace = await Workspace.findById(workspaceId);
+
 
     if (!project) {
       return res.status(404).json({
@@ -631,6 +639,26 @@ const archivedTask = async (req, res) => {
         message: "You are not a member of this project",
       });
     }
+
+
+    const userMemberInfo = project.members.find(
+      (member) => member.user.toString() === req.user._id.toString()
+    );
+
+    if (
+      !userMemberInfo ||
+      !["manager"].includes(userMemberInfo.role)
+    ) {
+      return res.status(403).json({
+        message: "You are not authorized to archive or unarchive the task",
+      });
+    }
+
+    // console.log(project.members);
+    
+    
+
+
     const isArchived = task.isArchived;
 
     task.isArchived = !isArchived;
@@ -652,6 +680,8 @@ const archivedTask = async (req, res) => {
     });
   }
 };
+
+
 
 const getMyTasks = async (req, res) => {
   console.log("Get all my task here");
@@ -711,6 +741,8 @@ const deleteTask = async (req, res) => {
 
     const project = await Project.findById(task.project);
 
+    const workspace = await Workspace.findById(project.workspace);
+
     if (!project) {
       return res.status(404).json({
         message: "Project not found",
@@ -724,6 +756,20 @@ const deleteTask = async (req, res) => {
     if (!isMember) {
       return res.status(403).json({
         message: "You are not a member of this project",
+      });
+    }
+
+
+    const userMemberInfo = workspace.members.find(
+      (member) => member.user.toString() === req.user._id.toString()
+    );
+
+    if (
+      !userMemberInfo ||
+      !["admin", "owner"].includes(userMemberInfo.role)
+    ) {
+      return res.status(403).json({
+        message: "You are not authorized to invite members to this workspace",
       });
     }
 

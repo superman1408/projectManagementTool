@@ -22,6 +22,17 @@ const createProject = async (req, res) => {
       });
     }
 
+
+    const userMemberInfo = workspace.members.find(
+      (member) => member.user.toString() === req.user._id.toString()
+    );
+
+    if (!userMemberInfo || !["admin", "owner", "member"].includes(userMemberInfo.role)) {
+      return res.status(403).json({
+        message: "You are not authorized to create project",
+      });
+    }
+
     const isMember = workspace.members.some(
       (member) => member.user.toString() === req.user._id.toString()
     );
