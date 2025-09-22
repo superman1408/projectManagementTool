@@ -5,6 +5,7 @@ import WorkspaceInvite from "../models/workspace-invite.js";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../libs/send-email.js";
 import { recordActivity } from "../libs/index.js";
+import { authorize } from "../config/config.js";
 
 const createWorkspace = async (req, res) => {
   console.log("Create Workspace is working here");
@@ -42,6 +43,7 @@ const getWorkspaces = async (req, res) => {
     const workspaces = await Workspace.find({
       "members.user": req.user._id,
     }).sort({ createdAt: -1 });
+
 
     res.status(200).json(workspaces);
   } catch (error) {
@@ -407,6 +409,8 @@ const acceptInviteByToken = async (req, res) => {
   }
 };
 
+
+
 const inviteUserToWorkspace = async (req, res) => {
   console.log("You reached invite user to workspace");
 
@@ -426,11 +430,27 @@ const inviteUserToWorkspace = async (req, res) => {
       (member) => member.user.toString() === req.user._id.toString()
     );
 
-    if (!userMemberInfo || !["admin", "owner"].includes(userMemberInfo.role)) {
-      return res.status(403).json({
-        message: "You are not authorized to invite members to this workspace",
-      });
-    }
+    // if (!userMemberInfo || !["admin", "owner"].includes(userMemberInfo.role)) {
+    //   return res.status(403).json({
+    //     message: "You are not authorized to invite members to this workspace",
+    //   });
+    // }
+    
+
+    // ✅ Check permission here
+    const canInvite = authorize(
+      userMemberInfo?.role,
+      "workspaceRoles",
+      "member:invite",
+    );
+
+
+    if (!canInvite) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to perform this action" });
+    };
+
 
     const existingUser = await User.findOne({ email });
 

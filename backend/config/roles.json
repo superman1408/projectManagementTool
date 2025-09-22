@@ -1,0 +1,114 @@
+{
+  "workspaceRoles": {
+    "owner": {
+      "permissions": {
+        "workspace:create": true,
+        "workspace:delete": true,
+        "workspace:update": true,
+        "workspace:settings": true,
+        "billing:manage": true,
+        "member:invite": true,
+        "member:remove": true,
+        "member:assignRole": true,
+        "project:create": true,
+        "project:delete": true,
+        "project:viewAll": true,
+        "task:viewAll": true,
+        "task:manageAll": true
+      }
+    },
+    "admin": {
+      "permissions": {
+        "workspace:create": false,
+        "workspace:delete": false,
+        "workspace:update": true,
+        "workspace:settings": true,
+        "billing:manage": false,
+        "member:invite": true,
+        "member:remove": true,
+        "member:assignRole": false,
+        "project:create": true,
+        "project:delete": true,
+        "project:viewAll": true,
+        "task:viewAll": true,
+        "task:manageAll": true
+      }
+    },
+    "member": {
+      "permissions": {
+        "workspace:create": false,
+        "workspace:delete": false,
+        "workspace:update": false,
+        "workspace:settings": false,
+        "billing:manage": false,
+        "member:invite": false,
+        "member:remove": false,
+        "member:assignRole": false,
+        "project:create": true,
+        "project:delete": false,
+        "project:viewAll": false,
+        "task:viewAll": true,
+        "task:manageOwn": true,
+        "task:manageAll": false
+      }
+    },
+    "viewer": {
+      "permissions": {
+        "workspace:create": false,
+        "workspace:delete": false,
+        "workspace:update": false,
+        "workspace:settings": false,
+        "billing:manage": false,
+        "member:invite": false,
+        "member:remove": false,
+        "member:assignRole": false,
+        "project:create": false,
+        "project:delete": false,
+        "project:viewAll": true,
+        "task:viewAll": true,
+        "task:manageOwn": false,
+        "task:manageAll": false
+      }
+    }
+  },
+  "projectRoles": {
+    "manager": {
+      "permissions": {
+        "project:update": true,
+        "project:delete": true,
+        "member:assignRole": true,
+        "task:create": true,
+        "task:update": true,
+        "task:delete": true,
+        "task:assign": true,
+        "task:viewAll": true
+      }
+    },
+    "contributor": {
+      "permissions": {
+        "project:update": false,
+        "project:delete": false,
+        "member:assignRole": false,
+        "task:create": true,
+        "task:update": true,
+        "task:delete": false,
+        "task:assign": false,
+        "task:viewAll": true,
+        "task:manageOwn": true
+      }
+    },
+    "viewer": {
+      "permissions": {
+        "project:update": false,
+        "project:delete": false,
+        "member:assignRole": false,
+        "task:create": false,
+        "task:update": false,
+        "task:delete": false,
+        "task:assign": false,
+        "task:viewAll": true,
+        "task:manageOwn": false
+      }
+    }
+  }
+}
