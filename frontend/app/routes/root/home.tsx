@@ -33,6 +33,7 @@ const Homepage = () => {
           <Sparkles className="absolute top-10 left-10 w-12 h-12 text-yellow-300 opacity-50 animate-pulse" />
           <Sparkles className="absolute bottom-10 right-10 w-16 h-16 text-pink-300 opacity-50 animate-bounce" />
         </div>
+         {/* <span className="text-[#E46025]">A</span ><span className="text-[#0B7882] font-helvetica">SH</span><span className="text-[#0D325C] font-helvetica">KAM</span> */}
 
         {/* Animated Title */}
         <motion.h1
@@ -41,7 +42,7 @@ const Homepage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          Welcome to <span className="text-[#E46025]">A</span ><span className="text-[#0B7882] font-helvetica">SH</span><span className="text-[#0D325C] font-helvetica">KAM</span> ENERGY PVT LTD
+          Welcome to ASHKAM ENERGY PVT LTD
           <span className="block mt-2 text-yellow-300">
             Project Management Tool
           </span>
@@ -96,7 +97,7 @@ const Homepage = () => {
             </a>
             <a
               title="email"
-              href="mailto:info@ashkam.in"
+              href="mailto:info_tec@ashkamenergy.com"
               className="hover:text-blue-400 transition-colors"
             >
               <Mail size={20} />
