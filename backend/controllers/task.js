@@ -703,6 +703,7 @@ const getMyTasks = async (req, res) => {
   }
 };
 
+
 // Get all archived tasks for the logged-in user
 const getArchivedTasks = async (req, res) => {
   console.log("You want to get archived task");
