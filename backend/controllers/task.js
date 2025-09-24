@@ -708,13 +708,48 @@ const getArchivedTasks = async (req, res) => {
   console.log("You want to get archived task");
 
   try {
+    // Step 1: Find workspaces where user is a member
+    const userWorkspaces = await Workspace.find({
+      "members.user": req.user._id,
+    }).select("_id members");
+
+    let projectFilter = {};
+
+    // Step 2: Check role in workspaces
+    let isOwnerOrAdmin = false;
+    for (const ws of userWorkspaces) {
+      const memberInfo = ws.members.find(
+        (m) => m.user.toString() === req.user._id.toString()
+      );
+      if (["owner", "admin"].includes(memberInfo?.role)) {
+        isOwnerOrAdmin = true;
+        break;
+      }
+    }
+
+    if (isOwnerOrAdmin) {
+      // Workspace owner/admin → fetch all projects from these workspaces
+      const workspaceIds = userWorkspaces.map((w) => w._id);
+      const projects = await Project.find({
+        workspace: { $in: workspaceIds },
+      }).select("_id");
+      projectFilter = { $in: projects.map((p) => p._id) };
+    } else {
+      // Regular project member → fetch only projects where user is a member
+      const projects = await Project.find({
+        "members.user": req.user._id,
+      }).select("_id");
+      projectFilter = { $in: projects.map((p) => p._id) };
+    }
+
+    // Step 3: Fetch archived tasks
     const archivedTasks = await Task.find({
       isArchived: true,
-      assignees: { $in: [req.user._id] }, // only tasks assigned to logged-in user
+      project: projectFilter,
     })
-      .populate("project", "title workspace") // optional: populate project details
-      .populate("createdBy", "name email profilePicture") // optional: populate creator
-      .sort({ updatedAt: -1 }); // latest archived first
+      .populate("project", "title workspace")
+      .populate("createdBy", "name email profilePicture")
+      .sort({ updatedAt: -1 });
 
     res.status(200).json(archivedTasks);
   } catch (error) {
@@ -725,6 +760,7 @@ const getArchivedTasks = async (req, res) => {
 
 
 
+// Delete a task
 const deleteTask = async (req, res) => {
   console.log("Now you can delete the Task here");
 
