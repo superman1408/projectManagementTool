@@ -45,6 +45,25 @@ const ProjectDetails = () => {
         <Loader />
       </div>
     );
+  
+  
+  
+  // if (!data || !workspaceId) return <div>Please select your Workspace</div>;
+
+  if (!projectId || !data) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-center">
+        <div className="rounded-xl bg-gray-100 px-6 py-4 shadow-sm">
+          <p className="text-lg font-medium text-gray-700">
+            Project not found
+          </p>
+          <p className="text-sm text-gray-500">
+            The project you are looking for does not include you or does not exist or has been removed. Please check the URL or contact the project administrator.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const { project, tasks } = data;
   const projectProgress = getProjectProgress(tasks);
