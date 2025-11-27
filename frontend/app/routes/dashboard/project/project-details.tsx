@@ -1,6 +1,7 @@
 
 import { BackButton } from "@/components/back-button";
 import { Loader } from "@/components/loader";
+import { InviteMemberProjectDialog } from "@/components/project/invite-member-project";
 import { ProjectStatusSelector } from "@/components/project/project-status-selector";
 import { CreateTaskDialog } from "@/components/task/create-task-dialog";
 import { TaskStatusSelector } from "@/components/task/task-status-selector";
@@ -20,6 +21,8 @@ import { AlertCircle, Calendar, CheckCircle, Clock } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
+import { UserPlus } from "lucide-react";
+
 
 const ProjectDetails = () => {
   const { projectId, workspaceId } = useParams<{
@@ -29,6 +32,7 @@ const ProjectDetails = () => {
   const navigate = useNavigate();
 
   const [isCreateTask, setIsCreateTask] = useState(false);
+  const [isInviteMember, setIsInviteMember] = useState(false);
   const [taskFilter, setTaskFilter] = useState<TaskStatus | "All">("All");
 
   const { data, isLoading } = UseProjectQuery(projectId!) as {
@@ -99,6 +103,10 @@ const ProjectDetails = () => {
             </span>
           </div>
 
+          <Button variant={"outline"} onClick={() => setIsInviteMember(true)}>
+            <UserPlus className="size-4 mr-2" />
+                        Invite
+          </Button>
           <Button onClick={() => setIsCreateTask(true)}>Add Task</Button>
         </div>
       </div>
@@ -205,6 +213,12 @@ const ProjectDetails = () => {
         projectId={projectId!}
         projectMembers={project.members as any}
       />
+
+      <InviteMemberProjectDialog
+        isOpen={isInviteMember}
+        onOpenChange={setIsInviteMember}
+        projectId={projectId}
+      />
     </div>
   );
 };
@@ -270,6 +284,8 @@ const TaskColumn = ({
   );
 };
 
+
+
 const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
 
   const { mutate, isPending } = useUpdateTaskStatusMutation();
@@ -296,117 +312,279 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
 
   
   return (
-    <Card
-      onClick={onClick}
-      className="cursor-pointer hover:shadow-md transition-all duration-300 hover:translate-y-1"
-    >
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <Badge
-            className={
-              task.priority === "High"
-                ? "bg-red-500 text-white"
-                : task.priority === "Medium"
-                ? "bg-orange-500 text-white"
-                : "bg-slate-500 text-white"
-            }
-          >
-            {task.priority}
-          </Badge>
+    <div onClick={onClick} className="cursor-pointer bg-gray-100 hover:bg-gray-50 transition-all border border-black rounded">
+      {/* Priority */}
+      <td className="p-2">
+        <Badge
+          className={
+            task.priority === "High"
+              ? "bg-red-500 text-white"
+              : task.priority === "Medium"
+              ? "bg-orange-500 text-white"
+              : "bg-slate-500 text-white"
+          }
+        >
+          {task.priority}
+        </Badge>
+      </td>
 
-          <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-            {task.status !== "To Do" && (
-              <Button
-                variant={"ghost"}
-                size={"icon"}
-                className="size-6"
-                onClick={() => handleUpdateStatus("To Do")}
-                title="Mark as To Do"
-                disabled={isPending}
-              >
-                <AlertCircle className={cn("size-4")} />
-                <span className="sr-only">Mark as To Do</span>
-              </Button>
-            )}
-            {task.status !== "In Progress" && (
-              <Button
-                variant={"ghost"}
-                size={"icon"}
-                className="size-6"
-                onClick={() => handleUpdateStatus("In Progress")}
-                title="Mark as In Progress"
-                disabled={isPending}
-              >
-                <Clock className={cn("size-4")} />
-                <span className="sr-only">Mark as In Progress</span>
-              </Button>
-            )}
-            {task.status !== "Done" && (
-              <Button
-                variant={"ghost"}
-                size={"icon"}
-                className="size-6"
-                onClick={() => handleUpdateStatus("Done")}
-                title="Mark as Done"
-                disabled={isPending}
-              >
-                <CheckCircle className={cn("size-4")} />
-                <span className="sr-only">Mark as Done</span>
-              </Button>
-            )}
-            {/* <TaskStatusSelector status={task.status} taskId={task._id} /> */}
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <h4 className="ont-medium mb-2">{task.title}</h4>
-
+      {/* Title + Description */}
+      <td className="p-2">
+        <div className="font-medium">{task.title}</div>
         {task.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+          <div className="text-xs text-muted-foreground line-clamp-2">
             {task.description}
-          </p>
+          </div>
         )}
+      </td>
 
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-2">
-            {task.assignees && task.assignees.length > 0 && (
-              <div className="flex -space-x-2">
-                {task.assignees.slice(0, 5).map((member) => (
-                  <Avatar
-                    key={member._id}
-                    className="relative size-8 bg-gray-700 rounded-full border-2 border-background overflow-hidden"
-                    title={member.name}
-                  >
-                    <AvatarImage src={member.profilePicture} />
-                    <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                ))}
-
-                {task.assignees.length > 5 && (
-                  <span className="text-xs text-muted-foreground">
-                    + {task.assignees.length - 5}
-                  </span>
-                )}
-              </div>
+      {/* Assignees */}
+      <td className="p-2">
+        {task.assignees && task.assignees.length > 0 && (
+          <div className="flex -space-x-2">
+            {task.assignees.slice(0, 5).map((member) => (
+              <Avatar
+                key={member._id}
+                className="size-8 bg-gray-700 rounded-full border-2 border-background overflow-hidden"
+                title={member.name}
+              >
+                <AvatarImage src={member.profilePicture} />
+                <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+            ))}
+            {task.assignees.length > 5 && (
+              <span className="text-xs text-muted-foreground">
+                + {task.assignees.length - 5}
+              </span>
             )}
           </div>
+        )}
+      </td>
 
-          {task.dueDate && (
-            <div className="text-xs text-muted-foreground flex items-center">
-              <Calendar className="size-3 mr-1" />
-              {format(new Date(task.dueDate), "MMM d, yyyy")}
-            </div>
+      {/* Due Date */}
+      <td className="p-2 text-xs text-muted-foreground">
+        {task.dueDate && (
+          <div className="flex items-center">
+            <Calendar className="size-3 mr-1" />
+            {format(new Date(task.dueDate), "MMM d, yyyy")}
+          </div>
+        )}
+      </td>
+
+      {/* Subtasks */}
+      <td className="p-2 text-xs text-muted-foreground">
+        {task.subtasks && task.subtasks.length > 0 && (
+          <span>
+            {task.subtasks.filter((s) => s.completed).length}/{task.subtasks.length}
+          </span>
+        )}
+      </td>
+
+      {/* Status update buttons */}
+      <td className="p-2" onClick={(e) => e.stopPropagation()}>
+        <div className="flex gap-1">
+          {task.status !== "To Do" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-6"
+              onClick={() => handleUpdateStatus("To Do")}
+              title="Mark as To Do"
+              disabled={isPending}
+            >
+              <AlertCircle className={cn("size-4")} />
+            </Button>
+          )}
+
+          {task.status !== "In Progress" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-6"
+              onClick={() => handleUpdateStatus("In Progress")}
+              title="Mark as In Progress"
+              disabled={isPending}
+            >
+              <Clock className={cn("size-4")} />
+            </Button>
+          )}
+
+          {task.status !== "Done" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-6"
+              onClick={() => handleUpdateStatus("Done")}
+              title="Mark as Done"
+              disabled={isPending}
+            >
+              <CheckCircle className={cn("size-4")} />
+            </Button>
           )}
         </div>
-        {/* 5/10 subtasks */}
-        {task.subtasks && task.subtasks.length > 0 && (
-          <div className="mt-2 text-xs text-muted-foreground">
-            {task.subtasks.filter((subtask) => subtask.completed).length} /{" "}
-            {task.subtasks.length} subtasks
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      </td>
+    </div>
   );
 };
+
+
+
+// import React from "react";
+// import { Badge } from "@/components/ui/badge";
+// import { Button } from "@/components/ui/button";
+// import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+// import { Calendar, AlertCircle, Clock, CheckCircle } from "lucide-react";
+// import { format } from "date-fns";
+// import { cn } from "@/lib/utils";
+
+// const TaskTableRow = ({ task, onClick, handleUpdateStatus, isPending }) => {
+//   return (
+    
+//   );
+// };
+
+// export default TaskTableRow;
+
+
+
+
+// const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
+
+//   const { mutate, isPending } = useUpdateTaskStatusMutation();
+  
+  
+
+//   const handleUpdateStatus = (status: TaskStatus) => {
+//     mutate(
+//       { taskId: task._id, status },
+//       {
+//         onSuccess: () => {
+//           toast.success(`Marked as ${status}`);
+//         },
+//         onError: (error: any) => {
+//           const errorMessage =
+//             error?.response?.data?.message || "Failed to update status";
+//           toast.error(errorMessage);
+//           console.error(error);
+//         },
+//       }
+//     );
+//   };
+
+
+  
+//   return (
+//     <Card
+//       onClick={onClick}
+//       className="cursor-pointer hover:shadow-md transition-all duration-300 hover:translate-y-1"
+//     >
+//       <CardHeader>
+//         <div className="flex items-center justify-between">
+//           <Badge
+//             className={
+//               task.priority === "High"
+//                 ? "bg-red-500 text-white"
+//                 : task.priority === "Medium"
+//                 ? "bg-orange-500 text-white"
+//                 : "bg-slate-500 text-white"
+//             }
+//           >
+//             {task.priority}
+//           </Badge>
+
+//           <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+//             {task.status !== "To Do" && (
+//               <Button
+//                 variant={"ghost"}
+//                 size={"icon"}
+//                 className="size-6"
+//                 onClick={() => handleUpdateStatus("To Do")}
+//                 title="Mark as To Do"
+//                 disabled={isPending}
+//               >
+//                 <AlertCircle className={cn("size-4")} />
+//                 <span className="sr-only">Mark as To Do</span>
+//               </Button>
+//             )}
+//             {task.status !== "In Progress" && (
+//               <Button
+//                 variant={"ghost"}
+//                 size={"icon"}
+//                 className="size-6"
+//                 onClick={() => handleUpdateStatus("In Progress")}
+//                 title="Mark as In Progress"
+//                 disabled={isPending}
+//               >
+//                 <Clock className={cn("size-4")} />
+//                 <span className="sr-only">Mark as In Progress</span>
+//               </Button>
+//             )}
+//             {task.status !== "Done" && (
+//               <Button
+//                 variant={"ghost"}
+//                 size={"icon"}
+//                 className="size-6"
+//                 onClick={() => handleUpdateStatus("Done")}
+//                 title="Mark as Done"
+//                 disabled={isPending}
+//               >
+//                 <CheckCircle className={cn("size-4")} />
+//                 <span className="sr-only">Mark as Done</span>
+//               </Button>
+//             )}
+//             {/* <TaskStatusSelector status={task.status} taskId={task._id} /> */}
+//           </div>
+//         </div>
+//       </CardHeader>
+
+//       <CardContent>
+//         <h4 className="ont-medium mb-2">{task.title}</h4>
+
+//         {task.description && (
+//           <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+//             {task.description}
+//           </p>
+//         )}
+
+//         <div className="flex items-center justify-between text-sm">
+//           <div className="flex items-center gap-2">
+//             {task.assignees && task.assignees.length > 0 && (
+//               <div className="flex -space-x-2">
+//                 {task.assignees.slice(0, 5).map((member) => (
+//                   <Avatar
+//                     key={member._id}
+//                     className="relative size-8 bg-gray-700 rounded-full border-2 border-background overflow-hidden"
+//                     title={member.name}
+//                   >
+//                     <AvatarImage src={member.profilePicture} />
+//                     <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+//                   </Avatar>
+//                 ))}
+
+//                 {task.assignees.length > 5 && (
+//                   <span className="text-xs text-muted-foreground">
+//                     + {task.assignees.length - 5}
+//                   </span>
+//                 )}
+//               </div>
+//             )}
+//           </div>
+
+//           {task.dueDate && (
+//             <div className="text-xs text-muted-foreground flex items-center">
+//               <Calendar className="size-3 mr-1" />
+//               {format(new Date(task.dueDate), "MMM d, yyyy")}
+//             </div>
+//           )}
+//         </div>
+//         {/* 5/10 subtasks */}
+//         {task.subtasks && task.subtasks.length > 0 && (
+//           <div className="mt-2 text-xs text-muted-foreground">
+//             {task.subtasks.filter((subtask) => subtask.completed).length} /{" "}
+//             {task.subtasks.length} subtasks
+//           </div>
+//         )}
+//       </CardContent>
+//     </Card>
+//   );
+// };

@@ -48,3 +48,11 @@ export const useUpdateProjectStatusMutation = () => {
     },
   });
 };
+
+
+export const useInviteMemberProjectMutation = () => {
+  return useMutation({
+    mutationFn: (data: { email: string; role: string; projectId: string }) =>
+      postData(`/projects/${data.projectId}/invite-member`, data),
+  });
+};

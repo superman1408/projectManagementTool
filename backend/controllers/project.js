@@ -193,10 +193,136 @@ const updateProjectStatus = async (req, res) => {
 };
 
 
+const inviteUserToProject = async (req, res) => {
+  console.log("You reached invite user to project");
+
+  const { projectId } = req.params;
+  const { email, role } = req.body;
+  console.log(email);
+  console.log(role);
+
+  
+
+  // try {
+  //   const { workspaceId } = req.params;
+  //   const { email, role } = req.body;
+
+  //   const workspace = await Workspace.findById(workspaceId);
+
+  //   if (!workspace) {
+  //     return res.status(404).json({
+  //       message: "Workspace not found",
+  //     });
+  //   }
+
+  //   const userMemberInfo = workspace.members.find(
+  //     (member) => member.user.toString() === req.user._id.toString()
+  //   );
+
+  //   // if (!userMemberInfo || !["admin", "owner"].includes(userMemberInfo.role)) {
+  //   //   return res.status(403).json({
+  //   //     message: "You are not authorized to invite members to this workspace",
+  //   //   });
+  //   // }
+
+  //   // ✅ Check permission here
+  //   const canInvite = authorize(
+  //     userMemberInfo?.role,
+  //     "workspaceRoles",
+  //     "member:invite",
+  //   );
+
+  //   if (!canInvite) {
+  //     return res
+  //       .status(403)
+  //       .json({ message: "You are not authorized to perform this action" });
+  //   };
+
+  //   const existingUser = await User.findOne({ email });
+
+  //   if (!existingUser) {
+  //     return res.status(400).json({
+  //       message: "User not found",
+  //     });
+  //   }
+
+  //   const isMember = workspace.members.some(
+  //     (member) => member.user.toString() === existingUser._id.toString()
+  //   );
+
+  //   if (isMember) {
+  //     return res.status(400).json({
+  //       message: "User already a member of this workspace",
+  //     });
+  //   }
+
+  //   const isInvited = await WorkspaceInvite.findOne({
+  //     user: existingUser._id,
+  //     workspaceId: workspaceId,
+  //   });
+
+  //   if (isInvited && isInvited.expiresAt > new Date()) {
+  //     return res.status(400).json({
+  //       message: "User already invited to this workspace",
+  //     });
+  //   }
+
+  //   if (isInvited && isInvited.expiresAt < new Date()) {
+  //     await WorkspaceInvite.deleteOne({ _id: isInvited._id });
+  //   }
+
+  //   const inviteToken = jwt.sign(
+  //     {
+  //       user: existingUser._id,
+  //       workspaceId: workspaceId,
+  //       role: role || "member",
+  //     },
+  //     process.env.JWT_SECRET,
+  //     { expiresIn: "7d" }
+  //   );
+
+  //   await WorkspaceInvite.create({
+  //     user: existingUser._id,
+  //     workspaceId: workspaceId,
+  //     token: inviteToken,
+  //     role: role || "member",
+  //     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  //   });
+
+  //   const invitationLink = `${process.env.FRONTEND_URL}/workspace-invite/${workspace._id}?tk=${inviteToken}`;
+  //   // const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+
+  //   const emailContent = `
+  //     <p>You have been invited to join ${workspace.name} workspace</p>
+  //     <p>Click here to join: <a href="${invitationLink}">${invitationLink}</a></p>
+  //   `;
+
+  //   await sendEmail(
+  //     email,
+  //     "You have been invited to join a workspace",
+  //     emailContent
+  //   );
+
+  //   res.status(200).json({
+  //     message: "Invitation sent successfully",
+  //   });
+  // } catch (error) {
+  //   console.log(error);
+  //   return res.status(500).json({
+  //     message: "Internal server error",
+  //   });
+  // }
+  res.status(200).json({
+    message: "Invitation Sent"
+  })
+};
+
+
 
 export {
   createProject,
   getProjectDetails,
   getProjectTasks,
   updateProjectStatus,
+  inviteUserToProject,
 };

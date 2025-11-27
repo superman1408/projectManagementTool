@@ -71,3 +71,9 @@ export const inviteMemberSchema = z.object({
   email: z.string().email(),
   role: z.enum(["admin", "member", "viewer"]),
 });
+
+
+export const inviteMemberProjectSchema = z.object({
+  email: z.string().email(),
+  role: z.enum(["manager", "contributor", "viewer"]),
+});

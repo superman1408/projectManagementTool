@@ -30,6 +30,12 @@ const inviteMemberSchema = z.object({
   role: z.enum(["admin", "member", "viewer"]),
 });
 
+
+const inviteMemberProjectSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  role: z.enum(["manager", "contributor", "viewer"]),
+});
+
 const tokenSchema = z.object({
   token: z.string().min(1, "Token is required"),
 });
@@ -83,4 +89,5 @@ export {
   taskSchema,
   inviteMemberSchema,
   tokenSchema,
+  inviteMemberProjectSchema,
 };
