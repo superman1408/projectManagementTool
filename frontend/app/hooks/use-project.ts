@@ -56,3 +56,13 @@ export const useInviteMemberProjectMutation = () => {
       postData(`/projects/${data.projectId}/invite-member`, data),
   });
 };
+
+
+export const useAcceptProjectInviteByTokenMutation = () => {
+  return useMutation({
+    mutationFn: ({token}: {token:string}) =>
+      postData(`/projects/accept-invite-token`, {
+        token,
+      }),
+  });
+};

@@ -310,7 +310,7 @@ const inviteUserToProject = async (req, res) => {
     const invitationLink = `${process.env.FRONTEND_URL}/project-invite/${project._id}?tk=${inviteToken}`;
 
     const emailContent = `
-      <p>You have been invited to join ${project.name} project</p>
+      <p>You have been invited to join ${project.title} project</p>
       <p>Click here to join: <a href="${invitationLink}">${invitationLink}</a></p>
     `;
 
@@ -404,10 +404,117 @@ const acceptInviteByToken = async (req, res) => {
 };
 
 
+const acceptProjectInviteByToken = async (req, res) => { 
+  console.log("You reached accept request by token in project section");
+
+  try {
+    const { token } = req.body;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const { user, workspaceId, projectId, role } = decoded;
+
+    const workspace = await Workspace.findById(workspaceId);
+
+    if (!workspace) {
+      return res.status(404).json({
+        message: "Workspace not found.",
+      });
+    }
+
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+      return res.status(404).json({
+        message: "Project not found.",
+      });
+    }
+
+    const inviteInfo = await ProjectInvite.findOne({
+      user,
+      projectId,
+    });
+
+    if (!inviteInfo) {
+      return res.status(404).json({
+        message: "Invitation not found.",
+      });
+    }
+
+    if (inviteInfo.expiresAt < new Date()) {
+      return res.status(410).json({
+        message: "Invitation expired",
+      });
+    }
+
+
+    const updatedProject = await Project.findOneAndUpdate(
+      { _id: projectId, "members.user": { $ne: user } },
+      {
+        $addToSet: {
+          members: {
+            user,
+            role: role || "contributor",
+            joinedAt: new Date(),
+          },
+        },
+      },
+      { new: true }
+    );
+
+
+    if (!updatedProject) {
+      return res.status(409).json({
+        message: "User is already member of the project team",
+      });
+    }
+
+
+    await Promise.all([
+      ProjectInvite.deleteOne({ _id: inviteInfo._id }),
+      recordActivity(
+        user,
+        "joined_project",
+        "Project",
+        projectId,
+        {
+          description: `Joined ${project.title} project team`,
+        }
+      ),
+    ]);
+
+    console.log("Done here");
+    
+
+    res.status(200).json({
+      message: "Invitation accepted successfully."
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+  
+};
+
+
 export {
   createProject,
   getProjectDetails,
   getProjectTasks,
   updateProjectStatus,
   inviteUserToProject,
+  acceptProjectInviteByToken,
 };
+
+
+
+// Alternatives (less ideal)
+
+// 400 Bad Request — generic, not recommended if you want clarity.
+
+// 403 Forbidden — incorrect, because the user isn’t forbidden; the link is just expired.
+
+// 404 Not Found — misleading, because the invite exists but is expired.
+
+// 👉 410 Gone is the correct semantic choice for expired or invalidated invitations.
