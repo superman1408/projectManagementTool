@@ -22,6 +22,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { UserPlus } from "lucide-react";
+import { SCurve } from "@/components/project/s-curve";
 
 
 const ProjectDetails = () => {
@@ -109,6 +110,13 @@ const ProjectDetails = () => {
           </Button>
           <Button onClick={() => setIsCreateTask(true)}>Add Task</Button>
         </div>
+        {/* <div>
+          <SCurve />
+        </div> */}
+      </div>
+{/* -----------------S Curve for monitoring the project---------------------------------------- */}
+      <div>
+        <SCurve project={project} />
       </div>
 
       <div className="flex items-center justify-between">
