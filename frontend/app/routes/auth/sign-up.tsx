@@ -22,8 +22,8 @@ import { toast } from 'sonner';
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Task Master" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "PMT- Sign Up" },
+    { name: "description", content: "Welcome Ashkam Energy Pvt Ltd!" },
   ];
 }
 

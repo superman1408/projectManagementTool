@@ -1,6 +1,7 @@
 import { Loader } from '@/components/loader';
 import { useGetWorkspaceStatsQuery } from '@/hooks/use-workspace';
 import React from 'react';
+import type { Route } from "../../+types/root";
 import { useSearchParams } from 'react-router';
 
 import type {
@@ -16,6 +17,16 @@ import { StatsCard } from '@/components/dashboard/stat-card';
 import { StatisticsCharts } from '@/components/dashboard/statistics-charts';
 import { RecentProjects } from '@/components/dashboard/recent-project';
 import { UpcomingTasks } from '@/components/upcoming-tasks';
+
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "PMT- Dashboard" },
+    { name: "description", content: "Welcome Ashkam Energy Pvt Ltd!" },
+  ];
+}
+
+
 
 const Dashboard = () => {
   const [searchParams] = useSearchParams();

@@ -1,4 +1,5 @@
 import { BackButton } from '@/components/back-button';
+import type { Route } from "../../../+types/root";
 import { Loader } from '@/components/loader';
 import { CommentSection } from '@/components/task/comment-section';
 import { SubTaskDetails } from '@/components/task/sub-tasks';
@@ -20,6 +21,17 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { any } from 'zod';
+
+
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "PMT- Task Detail" },
+    { name: "description", content: "Welcome Ashkam Energy Pvt Ltd!" },
+  ];
+}
+
+
 
 const TaskDetails = () => {
     const { user } = useAuth();

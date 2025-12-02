@@ -1,4 +1,5 @@
 import { Loader } from "@/components/loader";
+import type { Route } from "../../+types/root";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,15 @@ import { format } from "date-fns";
 import { ArrowUpRight, CheckCircle, Clock, FilterIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
+
+
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "PMT- individual Task" },
+    { name: "description", content: "Welcome Ashkam Energy Pvt Ltd!" },
+  ];
+}
 
 const MyTasks = () => {
   const [searchParams, setSearchParams] = useSearchParams();

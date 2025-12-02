@@ -1,4 +1,4 @@
-
+import type { Route } from "../../../+types/root";
 import { BackButton } from "@/components/back-button";
 import { Loader } from "@/components/loader";
 import { InviteMemberProjectDialog } from "@/components/project/invite-member-project";
@@ -24,6 +24,14 @@ import { toast } from "sonner";
 import { UserPlus } from "lucide-react";
 import { SCurve } from "@/components/project/s-curve";
 import { CurveRough } from "@/components/project/curve-Rough";
+
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "PMT- Project" },
+    { name: "description", content: "Welcome Ashkam Energy Pvt Ltd!" },
+  ];
+}
 
 
 const ProjectDetails = () => {
