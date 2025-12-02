@@ -203,6 +203,12 @@ export const SCurve = ({ project }: ChartProps) => {
   const start = new Date(project.startDate);
   const due = new Date(project.dueDate);
 
+  const getMonthName = (date: Date, offset: number) => {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + offset);
+    return d.toLocaleString("default", { month: "short" });
+  };
+
   // --- Calculate project duration ---
   let projectDuration =
     (due.getFullYear() - start.getFullYear()) * 12 +
@@ -219,7 +225,9 @@ export const SCurve = ({ project }: ChartProps) => {
   const midPoint = projectDuration / 2;
   const numerator = -Math.log(1 / 0.99 - 1);
   const denominator = monthIndex - midPoint || 0.00001;
-  const k = numerator / denominator;
+  // const k = numerator / denominator;
+  const k = Math.abs(numerator / denominator);
+
 
   // --- Logistic function ---
   const logistic = (t: number) => {
@@ -228,28 +236,146 @@ export const SCurve = ({ project }: ChartProps) => {
 
   // --- Generate chart data ---
   const chartData = Array.from({ length: projectDuration }, (_, t) => ({
-    month: t,
+    month: getMonthName(start, t),
     planned: logistic(t),
     actual: 0,
   }));
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>S-Curve</CardTitle>
-      </CardHeader>
 
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart data={chartData}>
-            <CartesianGrid />
-            <XAxis dataKey="month" />
-            <Line dataKey="planned" stroke="var(--chart-1)" />
-            <Line dataKey="actual" stroke="var(--chart-2)" />
-            <ChartTooltip content={<ChartTooltipContent />} />
-          </LineChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+  
+
+  // cumulative growth = last planned value
+  const cumulativeGrowth = chartData[chartData.length - 1].planned.toFixed(2);
+  console.log(cumulativeGrowth);
+
+  // Calculate average planned growth per month
+  const first = chartData[0].planned; // typically near 0
+  const last = chartData[chartData.length - 1].planned; // near 100
+
+  const averagePlannedGrowth = ((last - first) / projectDuration).toFixed(2);
+
+
+  
+
+  
+
+  return (
+    // <Card>
+    //   <CardHeader>
+    //      <CardTitle>Performance Tracking (Planned)</CardTitle>
+    //      <CardDescription>In project management,
+    //          an S-curve is a graphical representation showing how project progress or
+    //          costs accumulate over time, typically starting slow, rising rapidly during execution,
+    //          and leveling off as the project nears completion.
+    //          It is widely used to compare planned vs. actual performance and quickly identify whether
+    //          a project is ahead or behind schedule.
+    //      </CardDescription>
+    //    </CardHeader>
+    //   <CardContent>
+    //     <ChartContainer config={chartConfig}>
+    //       <LineChart data={chartData} margin={{left: 12, right: 12}}>
+    //         <CartesianGrid vertical={false} />
+    //         <XAxis dataKey="month" />
+    //         <Line dataKey="planned"  stroke="var(--chart-1)" />
+    //         {/* <Line dataKey="actual" stroke="var(--chart-2)" /> */}
+    //         <ChartTooltip content={<ChartTooltipContent />} />
+    //       </LineChart>
+    //     </ChartContainer>
+    //   </CardContent>
+    //   <CardFooter>
+    //      <div className="flex w-full items-start gap-2 text-sm">
+    //        <div className="grid gap-2">
+    //          <div className="flex items-center gap-2 leading-none font-medium">
+    //           Trending up by {averagePlannedGrowth} % every month <TrendingUp className="h-4 w-4" />
+    //          </div>
+    //          <div className="text-muted-foreground flex items-center gap-2 leading-none">
+    //            If actual progress dips below the planned curve → project is behind schedule.
+    //          </div>
+    //        </div>
+    //      </div>
+    //    </CardFooter>
+    // </Card>
+
+//     <Card className="w-full p-2">
+//   <CardHeader className="pt-1 pb-1">
+//     <CardTitle className="text-base">Performance Tracking (Planned)</CardTitle>
+
+//     <CardDescription className="text-xs line-clamp-3">
+//       In project management, an S-curve shows how progress accumulates over time.
+//       It helps compare planned vs actual performance.
+//     </CardDescription>
+//   </CardHeader>
+
+//   <CardContent className="py-1">
+//     <ChartContainer config={chartConfig} className="h-[180px]">
+//       <LineChart data={chartData} margin={{ left: 12, right: 12 }}>
+//         <CartesianGrid vertical={false} />
+//         <XAxis dataKey="month" />
+//         <Line dataKey="planned" stroke="var(--chart-1)" strokeWidth={2} dot={false} />
+//         <ChartTooltip content={<ChartTooltipContent />} />
+//       </LineChart>
+//     </ChartContainer>
+//   </CardContent>
+
+//   <CardFooter className="py-1">
+//     <div className="flex w-full items-start gap-2 text-sm">
+//       <div className="grid gap-1">
+//         <div className="flex items-center gap-2 leading-none font-medium text-xs">
+//           Trending up by {averagePlannedGrowth}% every month
+//           <TrendingUp className="h-3 w-3" />
+//         </div>
+
+//         <div className="text-muted-foreground text-xs leading-none">
+//           Actual progress below the curve means delay.
+//         </div>
+//       </div>
+//     </div>
+//   </CardFooter>
+    // </Card>
+    
+    <Card className="w-full max-w-[360px] flex flex-col p-1">
+  <CardHeader className="py-2">
+    <CardTitle className="text-sm">Performance Tracking (Planned)</CardTitle>
+
+    <CardDescription className="text-xs text-muted-foreground">
+      Planned progress trend using S-curve distribution.
+    </CardDescription>
+  </CardHeader>
+
+  <CardContent className="py-1">
+    <ChartContainer config={chartConfig} className="h-[140px]">
+      <LineChart data={chartData} margin={{ left: 12, right: 12 }}>
+        <CartesianGrid vertical={false} />
+        <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+        <Line
+          dataKey="planned"
+          stroke="var(--chart-1)"
+          strokeWidth={2}
+          dot={false}
+        />
+        <ChartTooltip content={<ChartTooltipContent />} />
+      </LineChart>
+    </ChartContainer>
+  </CardContent>
+
+  <CardFooter className="py-2">
+    <div className="flex w-full items-start gap-2 text-xs">
+      <div className="grid gap-1">
+        <div className="flex items-center gap-1 font-medium text-green-500">
+          Trending up by {averagePlannedGrowth}% every month
+          <TrendingUp className="h-3 w-3" />
+        </div>
+        {/* <div className="text-muted-foreground leading-none">
+          Actual progress below curve = behind schedule.
+            </div> */}
+            <div className="text-muted-foreground text-orange-300 leading-none">
+          If actual growth rate dips below the planned curve → project is behind schedule.
+        </div>
+      </div>
+    </div>
+  </CardFooter>
+</Card>
+
+
   );
 };

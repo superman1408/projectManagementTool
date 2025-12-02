@@ -23,6 +23,7 @@ import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { UserPlus } from "lucide-react";
 import { SCurve } from "@/components/project/s-curve";
+import { CurveRough } from "@/components/project/curve-Rough";
 
 
 const ProjectDetails = () => {
@@ -118,6 +119,9 @@ const ProjectDetails = () => {
       <div>
         <SCurve project={project} />
       </div>
+      {/* <div>
+        <CurveRough project={project} />
+      </div> */}
 
       <div className="flex items-center justify-between">
         <Tabs defaultValue="all" className="w-full">
