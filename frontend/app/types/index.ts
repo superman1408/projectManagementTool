@@ -84,6 +84,7 @@ export interface Task {
     createdAt: Date;
     updatedAt: Date;
     isArchived: boolean;
+    startDate: Date;
     dueDate: Date;
     priority: TaskPriority;
     assignee: User | string;
