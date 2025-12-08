@@ -79,6 +79,7 @@ const ProjectDetails = () => {
     );
   }
 
+
   const { project, tasks } = data;
   const projectProgress = getProjectProgress(tasks);
 
@@ -87,6 +88,28 @@ const ProjectDetails = () => {
       `/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
     );
   };
+
+
+
+  const sortByStartDate = (taskList: Task[]) => {
+    return [...taskList].sort(
+      (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    );
+  };
+
+
+  const sortByDueDate = (taskList: Task[]) => {
+    return [...taskList].sort(
+      (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+    );
+  };
+
+
+  const sortedTask = tasks.reverse();
+
+  
+
+
 
   return (
     <div className="space-y-8">
@@ -150,6 +173,10 @@ const ProjectDetails = () => {
               <TabsTrigger value="done" onClick={() => setTaskFilter("Done")}>
                 Done
               </TabsTrigger>
+
+              {/* ⭐ NEW SORTING TAB ⭐ */}
+              <TabsTrigger value="start-date">Start Date</TabsTrigger>
+              <TabsTrigger value="due-date">Due Date</TabsTrigger>
             </TabsList>
 
             <div className="flex items-center text-sm">
@@ -173,23 +200,27 @@ const ProjectDetails = () => {
             <div className="grid grid-cols-3 gap-4">
               <TaskColumn
                 title="To Do"
-                tasks={tasks.filter((task) => task.status === "To Do")}
+                tasks={sortedTask.filter((task) => task.status === "To Do")}
                 onTaskClick={handleTaskClick}
               />
 
               <TaskColumn
                 title="In Progress"
-                tasks={tasks.filter((task) => task.status === "In Progress")}
+                tasks={sortedTask.filter((task) => task.status === "In Progress")}
                 onTaskClick={handleTaskClick}
               />
 
               <TaskColumn
                 title="Done"
-                tasks={tasks.filter((task) => task.status === "Done")}
+                tasks={sortedTask.filter((task) => task.status === "Done")}
                 onTaskClick={handleTaskClick}
               />
             </div>
           </TabsContent>
+
+
+          
+
 
           <TabsContent value="todo" className="m-0">
             <div className="grid md:grid-cols-1 gap-4">
@@ -218,6 +249,28 @@ const ProjectDetails = () => {
               <TaskColumn
                 title="Done"
                 tasks={tasks.filter((task) => task.status === "Done")}
+                onTaskClick={handleTaskClick}
+                isFullWidth
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="start-date" className="m-0">
+            <div className="grid md:grid-cols-1 gap-4">
+              <TaskColumn
+                title="Tasks Sorted by Start Date"
+                tasks={sortByStartDate(tasks)}
+                onTaskClick={handleTaskClick}
+                isFullWidth
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="due-date" className="m-0">
+            <div className="grid md:grid-cols-1 gap-4">
+              <TaskColumn
+                title="Tasks Sorted by Due Date"
+                tasks={sortByDueDate(tasks)}
                 onTaskClick={handleTaskClick}
                 isFullWidth
               />
@@ -381,6 +434,16 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
         )}
       </td>
 
+      {/* Start Date */}
+      <td className="p-2 text-xs text-muted-foreground">
+        {task.startDate && (
+          <div className="flex items-center">
+            <Calendar className="size-3 mr-1" />
+            {format(new Date(task.startDate), "MMM d, yyyy")}
+          </div>
+        )}
+      </td>
+
       {/* Due Date */}
       <td className="p-2 text-xs text-muted-foreground">
         {task.dueDate && (
@@ -390,6 +453,7 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
           </div>
         )}
       </td>
+
 
       {/* Subtasks */}
       <td className="p-2 text-xs text-muted-foreground">
