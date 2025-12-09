@@ -10,7 +10,7 @@ const createTask = async (req, res) => {
   console.log("Create Task");
   try {
     const { projectId } = req.params;
-    const { title, description, status, priority, dueDate, assignees } =
+    const { title, description, status, priority, startDate, dueDate, assignees } =
       req.body;
 
     const project = await Project.findById(projectId);
@@ -44,6 +44,7 @@ const createTask = async (req, res) => {
       description,
       status,
       priority,
+      startDate,
       dueDate,
       assignees,
       project: projectId,

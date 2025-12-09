@@ -81,7 +81,8 @@
         "task:update": true,
         "task:delete": true,
         "task:assign": true,
-        "task:viewAll": true
+        "task:viewAll": true,
+        "member:invite": true
       }
     },
     "contributor": {
@@ -94,7 +95,8 @@
         "task:delete": false,
         "task:assign": false,
         "task:viewAll": true,
-        "task:manageOwn": true
+        "task:manageOwn": true,
+        "member:invite": false
       }
     },
     "viewer": {
@@ -107,7 +109,8 @@
         "task:delete": false,
         "task:assign": false,
         "task:viewAll": true,
-        "task:manageOwn": false
+        "task:manageOwn": false,
+        "member:invite": false
       }
     }
   }

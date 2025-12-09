@@ -1,4 +1,5 @@
 import { Loader } from "@/components/loader";
+import type { Route } from "../../+types/root";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,15 @@ import { format } from "date-fns";
 import { ArrowUpRight, CheckCircle, Clock, FilterIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
+
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "PMT- Dashboard" },
+    { name: "description", content: "Welcome Ashkam Energy Pvt Ltd!" },
+  ];
+}
+
 
 const Members = () => {
   const [searchParams, setSearchParams] = useSearchParams();

@@ -1,4 +1,5 @@
 import { BackButton } from '@/components/back-button';
+import type { Route } from "../../../+types/root";
 import { Loader } from '@/components/loader';
 import { CommentSection } from '@/components/task/comment-section';
 import { SubTaskDetails } from '@/components/task/sub-tasks';
@@ -20,6 +21,19 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { any } from 'zod';
+import { format } from "date-fns";
+import { AlertCircle, Calendar, CheckCircle, Clock } from "lucide-react";
+
+
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "PMT- Task Detail" },
+    { name: "description", content: "Welcome Ashkam Energy Pvt Ltd!" },
+  ];
+}
+
+
 
 const TaskDetails = () => {
     const { user } = useAuth();
@@ -240,6 +254,39 @@ const TaskDetails = () => {
                             </h3>
 
                             <TaskDescription description={task.description || ""} taskId={task._id} />
+                        </div>
+
+                        <div className='flex flex-row justify-between items-start p-2'>
+                            {/* Start Date */}
+                            <div className='mb-6'>
+                                <h3 className="text-sm font-medium text-muted-foreground mb-0">
+                                    Start Date
+                                </h3>
+                                <td className="p-2 text-xs text-muted-foreground">
+                                    {task.startDate && (
+                                    <div className="flex items-center">
+                                        <Calendar className="size-3 mr-1" />
+                                        {format(new Date(task.startDate), "MMM d, yyyy")}
+                                    </div>
+                                    )}
+                                </td>
+                            </div>
+                            
+
+                            {/* Due Date */}
+                            <div className='mb-6'>
+                                <h3 className="text-sm font-medium text-muted-foreground mb-0">
+                                    Due Date
+                                </h3>
+                            <td className="p-2 text-xs text-muted-foreground">
+                                    {task.dueDate && (
+                                            <div className="flex items-center">
+                                                <Calendar className="size-3 mr-1" />
+                                                {format(new Date(task.dueDate), "MMM d, yyyy")}
+                                            </div>
+                                        )}
+                                </td> 
+                            </div>
                         </div>
 
 

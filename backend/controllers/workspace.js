@@ -7,6 +7,8 @@ import { sendEmail } from "../libs/send-email.js";
 import { recordActivity } from "../libs/index.js";
 import { authorize } from "../config/config.js";
 
+
+
 const createWorkspace = async (req, res) => {
   console.log("Create Workspace is working here");
 
@@ -36,6 +38,7 @@ const createWorkspace = async (req, res) => {
   }
 };
 
+
 const getWorkspaces = async (req, res) => {
   console.log("get Workspace is working");
 
@@ -53,7 +56,6 @@ const getWorkspaces = async (req, res) => {
     });
   }
 };
-
 
 
 const getWorkspaceDetails = async (req, res) => {
@@ -79,6 +81,7 @@ const getWorkspaceDetails = async (req, res) => {
     });
   }
 };
+
 
 const getWorkspaceProjects = async (req, res) => {
   console.log("Get Workspace Projects");
@@ -116,7 +119,6 @@ const getWorkspaceProjects = async (req, res) => {
 };
 
 const getProjectDetails = async (req, res) => {};
-
 
 
 const getWorkspaceStats = async (req, res) => {
@@ -335,7 +337,6 @@ const getWorkspaceStats = async (req, res) => {
 };
 
 
-
 const acceptInviteByToken = async (req, res) => {
   console.log("You reached accept invite by token");
 
@@ -360,7 +361,7 @@ const acceptInviteByToken = async (req, res) => {
     }
 
     if (inviteInfo.expiresAt < new Date()) {
-      return res.status(400).json({ message: "Invitation has expired" });
+      return res.status(410).json({ message: "Invitation has expired" });
     }
 
     // ✅ Atomic add (prevents duplicates)
@@ -408,7 +409,6 @@ const acceptInviteByToken = async (req, res) => {
     });
   }
 };
-
 
 
 const inviteUserToWorkspace = async (req, res) => {

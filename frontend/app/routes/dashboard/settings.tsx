@@ -1,4 +1,14 @@
-import React from 'react'
+import React from 'react';
+import type { Route } from "../../+types/root";
+
+
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "PMT- Setting" },
+    { name: "description", content: "Welcome Ashkam Energy Pvt Ltd!" },
+  ];
+}
 
 const Setting = () => {
   return (

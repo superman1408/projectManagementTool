@@ -42,9 +42,9 @@ const Homepage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          Welcome to ASHKAM ENERGY PVT LTD
+          Enterprise Project Management Suite
           <span className="block mt-2 text-yellow-300">
-            Project Management Tool
+            Driving Operational Excellence
           </span>
         </motion.h1>
 
@@ -55,7 +55,7 @@ const Homepage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.8 }}
         >
-          Organize your work, boost productivity, and manage tasks like never before.
+          Enhance collaboration, optimize workflows, and ensure transparent project execution with a structured, enterprise-grade management system.
         </motion.p>
 
         {/* Buttons */}

@@ -1,13 +1,19 @@
 import express from "express";
 import authMiddleware  from "../middleware/auth-middleware.js";
 import { validateRequest } from "zod-express-middleware";
-import { projectSchema } from "../libs/validate-schema.js";
+import {
+  projectSchema,
+  tokenSchema,
+  inviteMemberProjectSchema,
+} from "../libs/validate-schema.js";
 import { z } from "zod";
 import {
   createProject,
   getProjectDetails,
   getProjectTasks,
   updateProjectStatus,
+  inviteUserToProject,
+  acceptProjectInviteByToken,
 } from "../controllers/project.js";
 
 
@@ -56,6 +62,25 @@ router.get(
     params: z.object({ projectId: z.string() }),
   }),
   getProjectTasks
+);
+
+
+router.post(
+  "/accept-invite-token",
+  authMiddleware,
+  validateRequest({ body: tokenSchema }),
+  acceptProjectInviteByToken
+);
+
+
+router.post(
+  "/:projectId/invite-member",
+  authMiddleware,
+  validateRequest({
+    params: z.object({ projectId: z.string() }),
+    body: inviteMemberProjectSchema,
+  }),
+  inviteUserToProject
 );
 
 
