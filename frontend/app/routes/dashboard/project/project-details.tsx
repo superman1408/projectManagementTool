@@ -24,6 +24,23 @@ import { toast } from "sonner";
 import { UserPlus } from "lucide-react";
 import { SCurve } from "@/components/project/s-curve";
 import { CurveRough } from "@/components/project/curve-Rough";
+import { TaskCard } from "@/components/task/task-card";
+import { TaskCardOld } from "@/components/task/task-card-old";
+import { TableDemo } from "@/components/task/table-demo";
+import { Link } from "react-router";
+
+
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -35,77 +52,118 @@ export function meta({}: Route.MetaArgs) {
 
 
 const ProjectDetails = () => {
-  const { projectId, workspaceId } = useParams<{
-    projectId: string;
-    workspaceId: string;
-  }>();
-  const navigate = useNavigate();
+    const { projectId, workspaceId } = useParams<{
+        projectId: string;
+        workspaceId: string;
+    }>();
+    const navigate = useNavigate();
 
-  const [isCreateTask, setIsCreateTask] = useState(false);
-  const [isInviteMember, setIsInviteMember] = useState(false);
-  const [taskFilter, setTaskFilter] = useState<TaskStatus | "All">("All");
+    const [isCreateTask, setIsCreateTask] = useState(false);
+    const [isInviteMember, setIsInviteMember] = useState(false);
+    
+    const { mutate, isPending } = useUpdateTaskStatusMutation();
 
-  const { data, isLoading } = UseProjectQuery(projectId!) as {
-    data: {
-      tasks: Task[];
-      project: Project;
+
+    const { data, isLoading } = UseProjectQuery(projectId!) as {
+        data: {
+            tasks: Task[];
+            project: Project;
+        };
+        isLoading: boolean;
     };
-    isLoading: boolean;
-  };
+  
 
-  if (isLoading)
-    return (
-      <div>
-        <Loader />
-      </div>
-    );
+    if (isLoading) {
+        return (
+            <div>
+                <Loader />
+            </div>
+        );
+    };
+        
   
   
   
   // if (!data || !workspaceId) return <div>Please select your Workspace</div>;
 
-  if (!projectId || !data) {
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-center">
-        <div className="rounded-xl bg-gray-100 px-6 py-4 shadow-sm">
-          <p className="text-lg font-medium text-gray-700">
-            Project not found
-          </p>
-          <p className="text-sm text-gray-500">
-            The project you are looking for does not include you or does not exist or has been removed. Please check the URL or contact the project administrator.
-          </p>
-        </div>
-      </div>
-    );
-  }
+    if (!projectId || !data) {
+        return (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-center">
+                <div className="rounded-xl bg-gray-100 px-6 py-4 shadow-sm">
+                    <p className="text-lg font-medium text-gray-700">
+                        Project not found
+                    </p>
+                    <p className="text-sm text-gray-500">
+                        The project you are looking for does not include you or does not exist or has been removed. Please check the URL or contact the project administrator.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
 
-  const { project, tasks } = data;
-  const projectProgress = getProjectProgress(tasks);
+    const { project, tasks } = data;
+    const projectProgress = getProjectProgress(tasks);
 
-  const handleTaskClick = (taskId: string) => {
-    navigate(
-      `/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
-    );
-  };
+    const handleTaskClick = (taskId: string) => {
+        navigate(
+            `/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
+        );
+    };
+    
+
+  
+  
+  
+
+    const handleUpdateStatus = (taskId: string, status: TaskStatus) => {
+        mutate(
+            { taskId , status },
+            {
+                onSuccess: () => {
+                    toast.success(`Marked as ${status}`);
+                },
+                onError: (error: any) => {
+                    const errorMessage =
+                    error?.response?.data?.message || "Failed to update status";
+                    toast.error(errorMessage);
+                    console.error(error);
+                },
+            }
+        );
+    };
 
 
 
-  const sortByStartDate = (taskList: Task[]) => {
-    return [...taskList].sort(
-      (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-    );
-  };
+    const sortByStartDate = (taskList: Task[]) => {
+        return [...taskList].sort(
+            (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        );
+    };
 
 
-  const sortByDueDate = (taskList: Task[]) => {
-    return [...taskList].sort(
-      (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-    );
-  };
+    const sortByDueDate = (taskList: Task[]) => {
+        return [...taskList].sort(
+            (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+        );
+    };
 
 
-  const sortedTask = tasks.reverse();
+    //   const sortedTask = tasks.reverse();
+    const sortedTask = [...tasks].reverse();
+    // const sortedTask = [...tasks].sort(
+    //     (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    // );
+
+    // const sortedTask = [...tasks]
+    //     .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+    // const sortedTask = [...tasks].sort(
+    //     (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    // );
+
+
+
 
   
 
@@ -142,533 +200,168 @@ const ProjectDetails = () => {
           </Button>
           <Button onClick={() => setIsCreateTask(true)}>Add Task</Button>
         </div>
-        {/* <div>
-          <SCurve />
-        </div> */}
       </div>
 {/* -----------------S Curve for monitoring the project---------------------------------------- */}
       <div>
         <SCurve project={project} />
       </div>
-      {/* <div>
-        <CurveRough project={project} />
-      </div> */}
+{/* ----------------------Task Table here-------------------------------------------------------- */}
+        <div>
+            <Table>
+                <TableCaption>A list of your Tasks in {project.title} project.</TableCaption>
+                <TableHeader>
+                    <TableRow className="bg-slate-300">
+                        <TableHead className=" text-black text-l font-extrabold">Task Priority</TableHead>
+                        <TableHead className="w-[100px] text-black text-l font-extrabold">Task Title</TableHead>
+                        <TableHead className=" text-black text-l text-center font-extrabold">Sub Tasks</TableHead>
+                        <TableHead className=" text-black text-l font-extrabold">Status</TableHead>
+                        <TableHead className=" text-black text-l font-extrabold">Start Date</TableHead>
+                        <TableHead className=" text-black text-l font-extrabold">Due Date</TableHead>
+                        <TableHead className=" text-black text-l font-extrabold">Assigned</TableHead>
+                        <TableHead className=" text-black text-l font-extrabold">ACTIONS</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {sortedTask.map((s) => (
+                        <TableRow key={s._id}>
+                            <TableCell className="text-center">
+                                <Badge
+                                    className={
+                                    s.priority === "High"
+                                        ? "bg-red-500 text-white"
+                                        : s.priority === "Medium"
+                                        ? "bg-orange-500 text-white"
+                                        : "bg-slate-500 text-white"
+                                    }
+                                >
+                                    {s.priority}
+                                </Badge>
+                            </TableCell>
+                            <TableCell className="font-medium">
+                                <Link
+                                    to={`/workspaces/${workspaceId}/projects/${projectId}/tasks/${s._id}`}
+                                    className="text-blue-600 hover:underline"
+                                >
+                                    {s.title}
+                                </Link>
+                            </TableCell>
+                            <TableCell className="text-center">
+                                {
+                                    s.subtasks && s.subtasks.length > 0 && (
+                                        <span>
+                                            {s.subtasks.filter((p) => p.completed).length}/{s.subtasks.length}
+                                        </span>
+                                    )
+                                }
+                            </TableCell>
+                            <TableCell className={
+                                    s.status === "To Do"
+                                        ? "bg-slate-500 text-white font-medium"
+                                        : s.status === "In Progress"
+                                            ? "bg-amber-400 text-white font-medium"
+                                            : "bg-green-600 text-white font-medium"
+                                }>
+                                    {s.status}
+                            </TableCell>
+                            <TableCell className="font-medium">{s.startDate ? format(new Date(s.startDate), "dd/MM/yyyy") : "--"}</TableCell>
+                            <TableCell className="font-medium">{s.dueDate ? format(new Date(s.dueDate), "dd/MM/yyyy") : "--"}</TableCell>
+                            <TableCell className="font-medium">
+                                {
+                                    s.assignees && s.assignees.length > 0 && (
+                                        <div className="flex -space-x-2">
+                                            {s.assignees.slice(0, 5).map((member) => (
+                                            <Avatar
+                                                key={member._id}
+                                                className="size-8 bg-gray-700 rounded-full border-2 border-background overflow-hidden"
+                                                title={member.name}
+                                            >
+                                                <AvatarImage src={member.profilePicture} />
+                                                <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                                            </Avatar>
+                                            ))}
+                                            {s.assignees.length > 5 && (
+                                            <span className="text-xs text-muted-foreground">
+                                                + {s.assignees.length - 5}
+                                            </span>
+                                            )}
+                                        </div>
+                                    )
+                                }
+                            </TableCell>
+                            <TableCell className="font-medium">
+                                {
+                                    <div className="flex gap-1">
+                                        {s.status !== "To Do" && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="size-6"
+                                                onClick={() => handleUpdateStatus(s._id, "To Do")}
+                                                title="Mark as To Do"
+                                                disabled={isPending}
+                                            >
+                                                <AlertCircle className={cn("size-4")} />
+                                            </Button>
+                                        )}
 
-      <div className="flex items-center justify-between">
-        <Tabs defaultValue="all" className="w-full">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <TabsList>
-              <TabsTrigger value="all" onClick={() => setTaskFilter("All")}>
-                All Tasks
-              </TabsTrigger>
-              <TabsTrigger value="todo" onClick={() => setTaskFilter("To Do")}>
-                To Do
-              </TabsTrigger>
-              <TabsTrigger
-                value="in-progress"
-                onClick={() => setTaskFilter("In Progress")}
-              >
-                In Progress
-              </TabsTrigger>
-              <TabsTrigger value="done" onClick={() => setTaskFilter("Done")}>
-                Done
-              </TabsTrigger>
+                                        {s.status !== "In Progress" && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="size-6"
+                                                onClick={() => handleUpdateStatus(s._id, "In Progress")}
+                                                title="Mark as In Progress"
+                                                disabled={isPending}
+                                            >
+                                                <Clock className={cn("size-4")} />
+                                            </Button>
+                                        )}
 
-              {/* ⭐ NEW SORTING TAB ⭐ */}
-              <TabsTrigger value="start-date">Start Date</TabsTrigger>
-              <TabsTrigger value="due-date">Due Date</TabsTrigger>
-            </TabsList>
-
-            <div className="flex items-center text-sm">
-              <span className="text-muted-foreground">Status:</span>
-              <div>
-                <Badge variant="outline" className="bg-background">
-                  {tasks.filter((task) => task.status === "To Do").length} To Do
-                </Badge>
-                <Badge variant="outline" className="bg-background">
-                  {tasks.filter((task) => task.status === "In Progress").length}{" "}
-                  In Progress
-                </Badge>
-                <Badge variant="outline" className="bg-background">
-                  {tasks.filter((task) => task.status === "Done").length} Done
-                </Badge>
-              </div>
-            </div>
-          </div>
-
-          <TabsContent value="all" className="m-0">
-            <div className="grid grid-cols-3 gap-4">
-              <TaskColumn
-                title="To Do"
-                tasks={sortedTask.filter((task) => task.status === "To Do")}
-                onTaskClick={handleTaskClick}
-              />
-
-              <TaskColumn
-                title="In Progress"
-                tasks={sortedTask.filter((task) => task.status === "In Progress")}
-                onTaskClick={handleTaskClick}
-              />
-
-              <TaskColumn
-                title="Done"
-                tasks={sortedTask.filter((task) => task.status === "Done")}
-                onTaskClick={handleTaskClick}
-              />
-            </div>
-          </TabsContent>
-
-
-          
-
-
-          <TabsContent value="todo" className="m-0">
-            <div className="grid md:grid-cols-1 gap-4">
-              <TaskColumn
-                title="To Do"
-                tasks={tasks.filter((task) => task.status === "To Do")}
-                onTaskClick={handleTaskClick}
-                isFullWidth
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="in-progress" className="m-0">
-            <div className="grid md:grid-cols-1 gap-4">
-              <TaskColumn
-                title="In Progress"
-                tasks={tasks.filter((task) => task.status === "In Progress")}
-                onTaskClick={handleTaskClick}
-                isFullWidth
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="done" className="m-0">
-            <div className="grid md:grid-cols-1 gap-4">
-              <TaskColumn
-                title="Done"
-                tasks={tasks.filter((task) => task.status === "Done")}
-                onTaskClick={handleTaskClick}
-                isFullWidth
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="start-date" className="m-0">
-            <div className="grid md:grid-cols-1 gap-4">
-              <TaskColumn
-                title="Tasks Sorted by Start Date"
-                tasks={sortByStartDate(tasks)}
-                onTaskClick={handleTaskClick}
-                isFullWidth
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="due-date" className="m-0">
-            <div className="grid md:grid-cols-1 gap-4">
-              <TaskColumn
-                title="Tasks Sorted by Due Date"
-                tasks={sortByDueDate(tasks)}
-                onTaskClick={handleTaskClick}
-                isFullWidth
-              />
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+                                        {s.status !== "Done" && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="size-6"
+                                                onClick={() => handleUpdateStatus(s._id, "Done")}
+                                                title="Mark as Done"
+                                                disabled={isPending}
+                                            >
+                                                <CheckCircle className={cn("size-4")} />
+                                            </Button>
+                                        )}
+                                    </div>
+                                }
+                            </TableCell>
+                            {/* <TableCell>{invoice.paymentMethod}</TableCell> */}
+                            {/* <TableCell className="text-right">{invoice.totalAmount}</TableCell> */}
+                        </TableRow>
+                    ))}
+                </TableBody>
+                {/* <TableFooter>
+                    <TableRow>
+                        <TableCell colSpan={3}>Total</TableCell>
+                        <TableCell className="text-right">$2,500.00</TableCell>
+                    </TableRow>
+                </TableFooter> */}
+            </Table>
+        </div>
 
       {/* create    task dialog */}
-      <CreateTaskDialog
-        open={isCreateTask}
-        onOpenChange={setIsCreateTask}
-        projectId={projectId!}
-        projectMembers={project.members as any}
-      />
+        <CreateTaskDialog
+            open={isCreateTask}
+            onOpenChange={setIsCreateTask}
+            projectId={projectId!}
+            projectMembers={project.members as any}
+        />
 
-      <InviteMemberProjectDialog
-        isOpen={isInviteMember}
-        onOpenChange={setIsInviteMember}
-        projectId={projectId}
-      />
+        <InviteMemberProjectDialog
+            isOpen={isInviteMember}
+            onOpenChange={setIsInviteMember}
+            projectId={projectId}
+        />
     </div>
   );
 };
 
 export default ProjectDetails;
 
-interface TaskColumnProps {
-  title: string;
-  tasks: Task[];
-  onTaskClick: (taskId: string) => void;
-  isFullWidth?: boolean;
-}
-
-const TaskColumn = ({
-  title,
-  tasks,
-  onTaskClick,
-  isFullWidth = false,
-}: TaskColumnProps) => {
-  return (
-    <div
-      className={
-        isFullWidth
-          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-          : ""
-      }
-    >
-      <div
-        className={cn(
-          "space-y-4",
-          !isFullWidth ? "h-full" : "col-span-full mb-4"
-        )}
-      >
-        {!isFullWidth && (
-          <div className="flex items-center justify-between">
-            <h1 className="font-medium">{title}</h1>
-            <Badge variant="outline">{tasks.length}</Badge>
-          </div>
-        )}
-
-        <div
-          className={cn(
-            "space-y-3",
-            isFullWidth && "grid grid-cols-2 lg:grid-cols-3 gap-4"
-          )}
-        >
-          {tasks.length === 0 ? (
-            <div className="text-center text-sm text-muted-foreground">
-              No tasks yet
-            </div>
-          ) : (
-            tasks.map((task) => (
-              <TaskCard
-                key={task._id}
-                task={task}
-                onClick={() => onTaskClick(task._id)}
-              />
-            ))
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-
-
-const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
-
-  const { mutate, isPending } = useUpdateTaskStatusMutation();
-  
-  
-
-  const handleUpdateStatus = (status: TaskStatus) => {
-    mutate(
-      { taskId: task._id, status },
-      {
-        onSuccess: () => {
-          toast.success(`Marked as ${status}`);
-        },
-        onError: (error: any) => {
-          const errorMessage =
-            error?.response?.data?.message || "Failed to update status";
-          toast.error(errorMessage);
-          console.error(error);
-        },
-      }
-    );
-  };
-
-
-  
-  return (
-    <div onClick={onClick} className="cursor-pointer bg-gray-100 hover:bg-gray-50 transition-all border border-black rounded">
-      {/* Priority */}
-      <td className="p-2">
-        <Badge
-          className={
-            task.priority === "High"
-              ? "bg-red-500 text-white"
-              : task.priority === "Medium"
-              ? "bg-orange-500 text-white"
-              : "bg-slate-500 text-white"
-          }
-        >
-          {task.priority}
-        </Badge>
-      </td>
-
-      {/* Title + Description */}
-      <td className="p-2">
-        <div className="font-medium">{task.title}</div>
-        {task.description && (
-          <div className="text-xs text-muted-foreground line-clamp-2">
-            {task.description}
-          </div>
-        )}
-      </td>
-
-      {/* Assignees */}
-      <td className="p-2">
-        {task.assignees && task.assignees.length > 0 && (
-          <div className="flex -space-x-2">
-            {task.assignees.slice(0, 5).map((member) => (
-              <Avatar
-                key={member._id}
-                className="size-8 bg-gray-700 rounded-full border-2 border-background overflow-hidden"
-                title={member.name}
-              >
-                <AvatarImage src={member.profilePicture} />
-                <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-            ))}
-            {task.assignees.length > 5 && (
-              <span className="text-xs text-muted-foreground">
-                + {task.assignees.length - 5}
-              </span>
-            )}
-          </div>
-        )}
-      </td>
-
-      {/* Start Date */}
-      <td className="p-2 text-xs text-muted-foreground">
-        {task.startDate && (
-          <div className="flex items-center">
-            <Calendar className="size-3 mr-1" />
-            {format(new Date(task.startDate), "MMM d, yyyy")}
-          </div>
-        )}
-      </td>
-
-      {/* Due Date */}
-      <td className="p-2 text-xs text-muted-foreground">
-        {task.dueDate && (
-          <div className="flex items-center">
-            <Calendar className="size-3 mr-1" />
-            {format(new Date(task.dueDate), "MMM d, yyyy")}
-          </div>
-        )}
-      </td>
-
-
-      {/* Subtasks */}
-      <td className="p-2 text-xs text-muted-foreground">
-        {task.subtasks && task.subtasks.length > 0 && (
-          <span>
-            {task.subtasks.filter((s) => s.completed).length}/{task.subtasks.length}
-          </span>
-        )}
-      </td>
-
-      {/* Status update buttons */}
-      <td className="p-2" onClick={(e) => e.stopPropagation()}>
-        <div className="flex gap-1">
-          {task.status !== "To Do" && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-6"
-              onClick={() => handleUpdateStatus("To Do")}
-              title="Mark as To Do"
-              disabled={isPending}
-            >
-              <AlertCircle className={cn("size-4")} />
-            </Button>
-          )}
-
-          {task.status !== "In Progress" && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-6"
-              onClick={() => handleUpdateStatus("In Progress")}
-              title="Mark as In Progress"
-              disabled={isPending}
-            >
-              <Clock className={cn("size-4")} />
-            </Button>
-          )}
-
-          {task.status !== "Done" && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-6"
-              onClick={() => handleUpdateStatus("Done")}
-              title="Mark as Done"
-              disabled={isPending}
-            >
-              <CheckCircle className={cn("size-4")} />
-            </Button>
-          )}
-        </div>
-      </td>
-    </div>
-  );
-};
-
-
-
-// import React from "react";
-// import { Badge } from "@/components/ui/badge";
-// import { Button } from "@/components/ui/button";
-// import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-// import { Calendar, AlertCircle, Clock, CheckCircle } from "lucide-react";
-// import { format } from "date-fns";
-// import { cn } from "@/lib/utils";
-
-// const TaskTableRow = ({ task, onClick, handleUpdateStatus, isPending }) => {
-//   return (
-    
-//   );
-// };
-
-// export default TaskTableRow;
-
-
-
-
-// const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
-
-//   const { mutate, isPending } = useUpdateTaskStatusMutation();
-  
-  
-
-//   const handleUpdateStatus = (status: TaskStatus) => {
-//     mutate(
-//       { taskId: task._id, status },
-//       {
-//         onSuccess: () => {
-//           toast.success(`Marked as ${status}`);
-//         },
-//         onError: (error: any) => {
-//           const errorMessage =
-//             error?.response?.data?.message || "Failed to update status";
-//           toast.error(errorMessage);
-//           console.error(error);
-//         },
-//       }
-//     );
-//   };
-
-
-  
-//   return (
-//     <Card
-//       onClick={onClick}
-//       className="cursor-pointer hover:shadow-md transition-all duration-300 hover:translate-y-1"
-//     >
-//       <CardHeader>
-//         <div className="flex items-center justify-between">
-//           <Badge
-//             className={
-//               task.priority === "High"
-//                 ? "bg-red-500 text-white"
-//                 : task.priority === "Medium"
-//                 ? "bg-orange-500 text-white"
-//                 : "bg-slate-500 text-white"
-//             }
-//           >
-//             {task.priority}
-//           </Badge>
-
-//           <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-//             {task.status !== "To Do" && (
-//               <Button
-//                 variant={"ghost"}
-//                 size={"icon"}
-//                 className="size-6"
-//                 onClick={() => handleUpdateStatus("To Do")}
-//                 title="Mark as To Do"
-//                 disabled={isPending}
-//               >
-//                 <AlertCircle className={cn("size-4")} />
-//                 <span className="sr-only">Mark as To Do</span>
-//               </Button>
-//             )}
-//             {task.status !== "In Progress" && (
-//               <Button
-//                 variant={"ghost"}
-//                 size={"icon"}
-//                 className="size-6"
-//                 onClick={() => handleUpdateStatus("In Progress")}
-//                 title="Mark as In Progress"
-//                 disabled={isPending}
-//               >
-//                 <Clock className={cn("size-4")} />
-//                 <span className="sr-only">Mark as In Progress</span>
-//               </Button>
-//             )}
-//             {task.status !== "Done" && (
-//               <Button
-//                 variant={"ghost"}
-//                 size={"icon"}
-//                 className="size-6"
-//                 onClick={() => handleUpdateStatus("Done")}
-//                 title="Mark as Done"
-//                 disabled={isPending}
-//               >
-//                 <CheckCircle className={cn("size-4")} />
-//                 <span className="sr-only">Mark as Done</span>
-//               </Button>
-//             )}
-//             {/* <TaskStatusSelector status={task.status} taskId={task._id} /> */}
-//           </div>
-//         </div>
-//       </CardHeader>
-
-//       <CardContent>
-//         <h4 className="ont-medium mb-2">{task.title}</h4>
-
-//         {task.description && (
-//           <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-//             {task.description}
-//           </p>
-//         )}
-
-//         <div className="flex items-center justify-between text-sm">
-//           <div className="flex items-center gap-2">
-//             {task.assignees && task.assignees.length > 0 && (
-//               <div className="flex -space-x-2">
-//                 {task.assignees.slice(0, 5).map((member) => (
-//                   <Avatar
-//                     key={member._id}
-//                     className="relative size-8 bg-gray-700 rounded-full border-2 border-background overflow-hidden"
-//                     title={member.name}
-//                   >
-//                     <AvatarImage src={member.profilePicture} />
-//                     <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-//                   </Avatar>
-//                 ))}
-
-//                 {task.assignees.length > 5 && (
-//                   <span className="text-xs text-muted-foreground">
-//                     + {task.assignees.length - 5}
-//                   </span>
-//                 )}
-//               </div>
-//             )}
-//           </div>
-
-//           {task.dueDate && (
-//             <div className="text-xs text-muted-foreground flex items-center">
-//               <Calendar className="size-3 mr-1" />
-//               {format(new Date(task.dueDate), "MMM d, yyyy")}
-//             </div>
-//           )}
-//         </div>
-//         {/* 5/10 subtasks */}
-//         {task.subtasks && task.subtasks.length > 0 && (
-//           <div className="mt-2 text-xs text-muted-foreground">
-//             {task.subtasks.filter((subtask) => subtask.completed).length} /{" "}
-//             {task.subtasks.length} subtasks
-//           </div>
-//         )}
-//       </CardContent>
-//     </Card>
-//   );
-// };
