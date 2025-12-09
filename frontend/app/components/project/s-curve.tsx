@@ -368,7 +368,7 @@ export const SCurve = ({ project }: ChartProps) => {
         {/* <div className="text-muted-foreground leading-none">
           Actual progress below curve = behind schedule.
             </div> */}
-            <div className="text-muted-foreground text-orange-300 leading-none">
+            <div className="text-orange-300 leading-none">
           If actual growth rate dips below the planned curve → project is behind schedule.
         </div>
       </div>
